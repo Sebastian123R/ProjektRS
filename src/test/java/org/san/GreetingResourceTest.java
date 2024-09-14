@@ -1,4 +1,4 @@
-package org.san;
+package org.san.Books;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package org.san;
+package org.san.Books.app;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
