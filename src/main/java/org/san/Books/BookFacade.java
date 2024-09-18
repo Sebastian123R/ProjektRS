@@ -15,12 +15,7 @@ public abstract class BookFacade {
     Optional<List<Book>> findBook(String title){
         return Optional.ofNullable(bookRepository
                 .getBookByTitle(title));
-    };
-
-    List<Book> showAllBooks(){
-        return bookRepository
-                .getAllBooks();
-    };
+    }
 
     Optional<List<Book>> findBooksByAuthor(Author author){
         return Optional.ofNullable(bookRepository
