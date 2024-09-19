@@ -1,7 +1,6 @@
 package org.san.Books.app;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.san.Books.Author;
 import org.san.Books.Book;
 import org.san.Books.BookRepository;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class BookRepositoryImpl implements BookRepository {
-    @Inject
+
     DataSource dataSource;
     @Override
     public List<Book> getBookByTitle(String title) {
@@ -42,6 +41,7 @@ public class BookRepositoryImpl implements BookRepository {
                       Book book = new BookRecord(bookId, title, authorName, authorSurname, year);
                       books.add(book);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
