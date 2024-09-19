@@ -34,12 +34,13 @@ public class BookRepositoryImpl implements BookRepository {
              ResultSet resultSet = statement.executeQuery("SELECT id, title, authorName, authorSurname, year FROM Books")) {
 
             while (resultSet.next()) {
-                      String bookId = resultSet.getString("bookId");
+                      String bookId = resultSet.getString("id");
                       String title = resultSet.getString("title");
                       String authorName = resultSet.getString("authorName");
                       String authorSurname =  resultSet.getString("authorSurname");
                       int year = resultSet.getInt("year");
                       Book book = new BookRecord(bookId, title, authorName, authorSurname, year);
+                      books.add(book);
             }
         } catch (Exception e) {
             e.printStackTrace();
