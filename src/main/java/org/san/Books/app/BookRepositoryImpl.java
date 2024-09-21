@@ -1,27 +1,42 @@
 package org.san.Books.app;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.san.Books.Author;
 import org.san.Books.Book;
+import org.san.Books.BookId;
 import org.san.Books.BookRepository;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class BookRepositoryImpl implements BookRepository {
 
+    @Inject
     DataSource dataSource;
+
     @Override
     public List<Book> getBookByTitle(String title) {
         return List.of();
     }
 
     @Override
-    public List<Book> findBookByAuthor(Author author) {
+    public List<Book> findBookByAuthor(Author author) throws SQLException {
+
+        List<Book> books = new ArrayList<>();
+
+        String sql = "SELECT id, title, authorName, authorSurname, year FROM Books " +
+                "WHERE authorName = ? AND authorSurname = ?";
+
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1,author.authorName() );
+            preparedStatement.setString(2,author.authorSurname());
+        }
+
         return List.of();
     }
 
@@ -33,12 +48,11 @@ public class BookRepositoryImpl implements BookRepository {
              ResultSet resultSet = statement.executeQuery("SELECT id, title, authorName, authorSurname, year FROM Books")) {
 
             while (resultSet.next()) {
-                      String bookId = resultSet.getString("id");
+                      BookId bookId = new BookIdRecord(resultSet.getString("id"));
                       String title = resultSet.getString("title");
-                      String authorName = resultSet.getString("authorName");
-                      String authorSurname =  resultSet.getString("authorSurname");
+                      Author author = new AuthorRecord(resultSet.getString("authorName"),resultSet.getString("authorSurname"));
                       int year = resultSet.getInt("year");
-                      Book book = new BookRecord(bookId, title, authorName, authorSurname, year);
+                      Book book = new BookRecord(bookId, title, author, year);
                       books.add(book);
             }
 

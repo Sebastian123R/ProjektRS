@@ -1,9 +1,25 @@
 package org.san.Books.app;
 
-public record BookRecord(String bookId,
+import org.san.Books.Author;
+import org.san.Books.BookId;
+
+public record BookRecord(BookId bookId,
                          String title,
-                         String authorName,
-                         String authorSurname,
+                         Author author,
                          int year) implements org.san.Books.Book {
 
+    @Override
+    public BookId BookId() {
+        return bookId;
+    }
+
+    @Override
+    public String Title() {
+        return title;
+    }
+
+    @Override
+    public Author Author() {
+        return author;
+    }
 }
