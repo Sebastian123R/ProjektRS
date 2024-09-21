@@ -4,10 +4,12 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.san.Books.Book;
 import org.san.Books.BookRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Path("/books/v1")
@@ -17,9 +19,19 @@ public class BookResource {
     BookRepository bookRepositoryImpl;
 
     @GET
+    @Path("/allbooks")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Book> getAllBooks() {
 
         return bookRepositoryImpl.getAllBooks();
+    }
+
+    @GET
+    @Path("/author")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Book> getByAuthor(
+            @QueryParam("authorName") String authorName,
+            @QueryParam("authorSurname") String authorSurname) throws SQLException {
+        return bookRepositoryImpl.findBookByAuthor(new AuthorRecord(authorName,authorSurname));
     }
 }

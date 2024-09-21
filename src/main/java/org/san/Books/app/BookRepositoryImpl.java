@@ -35,9 +35,20 @@ public class BookRepositoryImpl implements BookRepository {
 
             preparedStatement.setString(1,author.authorName() );
             preparedStatement.setString(2,author.authorSurname());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    BookId bookId = new BookIdRecord(resultSet.getString("id"));
+                    String title = resultSet.getString("title");
+                    Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
+                    int year = resultSet.getInt("year");
+                    Book book = new BookRecord(bookId, title, bookAuthor, year);
+                    books.add(book);
+                }
+            }
         }
 
-        return List.of();
+        return books;
     }
 
     @Override
