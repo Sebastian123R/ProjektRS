@@ -18,8 +18,33 @@ public class BookRepositoryImpl implements BookRepository {
     DataSource dataSource;
 
     @Override
-    public List<Book> getBookByTitle(String title) {
-        return List.of();
+    public List<Book> getBookByTitle(String title) throws SQLException {
+
+        List<Book> books = new ArrayList<>();
+
+        String sql = "SELECT id, title, authorName, authorSurname, year FROM Books " +
+                "WHERE title = ?";
+
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1,title);
+
+        try(ResultSet resultSet = preparedStatement.executeQuery()){
+            while(resultSet.next()) {
+                BookId bookId = new BookIdRecord(resultSet.getString("id"));
+                String bookTitle = resultSet.getString("title");
+                Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
+                int year = resultSet.getInt("year");
+                Book book = new BookRecord(bookId, bookTitle, bookAuthor, year);
+                books.add(book);
+            }
+
+        }
+        }
+
+
+        return books;
     }
 
     @Override

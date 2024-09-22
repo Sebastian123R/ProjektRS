@@ -34,4 +34,11 @@ public class BookResource {
             @QueryParam("authorSurname") String authorSurname) throws SQLException {
         return bookRepositoryImpl.findBookByAuthor(new AuthorRecord(authorName,authorSurname));
     }
+
+    @GET
+    @Path("/Title")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Book> getByTitle(@QueryParam("title") String title) throws SQLException {
+    return bookRepositoryImpl.getBookByTitle(title);
+    }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface BookRepository {
 
-    List<Book> getBookByTitle(String title);
+    List<Book> getBookByTitle(String title) throws SQLException;
 
     List<Book> findBookByAuthor(Author author) throws SQLException;
 
