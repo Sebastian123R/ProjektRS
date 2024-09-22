@@ -47,8 +47,8 @@ public class BookResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response insertBook(BookDTO bookDTO) throws SQLException {
-        Author author = new AuthorRecord(bookDTO.getAuthorName(), bookDTO.getAuthorSurname());
-        Book book = new BookRecord(new BookIdRecord(UUID.randomUUID().toString()), bookDTO.getTitle(), author, bookDTO.getYear());
+        Author author = new AuthorRecord(bookDTO.authorName(), bookDTO.authorSurname());
+        Book book = new BookRecord(new BookIdRecord(UUID.randomUUID().toString()), bookDTO.title(), author, bookDTO.year());
         bookRepositoryImpl.insertBook(book);
         return Response.status(Response.Status.CREATED).build();
     }
