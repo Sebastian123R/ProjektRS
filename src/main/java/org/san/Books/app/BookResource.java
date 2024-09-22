@@ -1,16 +1,16 @@
 package org.san.Books.app;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.san.Books.Author;
 import org.san.Books.Book;
 import org.san.Books.BookRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/books/v1")
 public class BookResource {
@@ -40,5 +40,16 @@ public class BookResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Book> getByTitle(@QueryParam("title") String title) throws SQLException {
     return bookRepositoryImpl.getBookByTitle(title);
+    }
+
+    @POST
+    @Path("/insert")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response insertBook(BookDTO bookDTO) throws SQLException {
+        Author author = new AuthorRecord(bookDTO.getAuthorName(), bookDTO.getAuthorSurname());
+        Book book = new BookRecord(new BookIdRecord(UUID.randomUUID().toString()), bookDTO.getTitle(), author, bookDTO.getYear());
+        bookRepositoryImpl.insertBook(book);
+        return Response.status(Response.Status.CREATED).build();
     }
 }

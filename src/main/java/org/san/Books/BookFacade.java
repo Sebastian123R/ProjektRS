@@ -13,9 +13,4 @@ public abstract class BookFacade {
         this.bookRepository =Objects.requireNonNull(bookRepository);
     }
 
-
-    Optional<List<Book>> findBooksByAuthor(Author author) throws SQLException {
-        return Optional.ofNullable(bookRepository
-                .findBookByAuthor(author));
-    }
 }

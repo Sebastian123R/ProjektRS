@@ -101,6 +101,23 @@ public class BookRepositoryImpl implements BookRepository {
     public List<Book> sortByTitle(List<Book> books) {
         return List.of();
     }
+
+    @Override
+    public void insertBook(Book book) throws SQLException {
+        String sql = "INSERT INTO Books (id, title, authorName, authorSurname, year) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, book.BookId().BookId());
+            preparedStatement.setString(2, book.Title());
+            preparedStatement.setString(3, book.Author().authorName());
+            preparedStatement.setString(4, book.Author().authorSurname());
+            preparedStatement.setInt(5, book.year());
+
+            preparedStatement.executeUpdate();
+        }
     }
+}
 
 

@@ -12,4 +12,6 @@ public interface BookRepository {
     List<Book> getAllBooks();
 
     List<Book> sortByTitle(List<Book> books);
+
+    void insertBook(Book book) throws SQLException;
 }
