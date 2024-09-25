@@ -6,7 +6,7 @@ import org.san.Books.BookId;
  public record BookIdRecord(String bookId) implements BookId {
 
      @Override
-     public String BookId() {
+     public String bookId() {
          return bookId;
      }
  }

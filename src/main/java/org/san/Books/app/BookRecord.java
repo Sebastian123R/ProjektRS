@@ -6,7 +6,7 @@ import org.san.Books.BookId;
 public record BookRecord(BookId bookId,
                          String title,
                          Author author,
-                         int year) implements org.san.Books.Book {
+                         int year, boolean isReserved, boolean isBorrowed) implements org.san.Books.Book {
 
     @Override
     public BookId BookId() {

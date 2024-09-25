@@ -1,5 +1,7 @@
 package org.san.Books;
 
+import org.san.Books.app.BookIdRecord;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -11,7 +13,13 @@ public interface BookRepository {
 
     List<Book> getAllBooks();
 
-    List<Book> sortByTitle(List<Book> books);
-
     void insertBook(Book book) throws SQLException;
+
+    void reserveBook(BookId bookid) throws SQLException;
+
+    void cancelReservation(BookId id) throws SQLException;
+
+    void borrowBook(BookId id) throws SQLException;
+
+    void returnBook(BookId id) throws SQLException;
 }
