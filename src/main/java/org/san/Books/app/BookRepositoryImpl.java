@@ -2,20 +2,23 @@ package org.san.Books.app;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.san.Books.Author;
-import org.san.Books.Book;
-import org.san.Books.BookId;
-import org.san.Books.BookRepository;
+import org.san.Books.*;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class BookRepositoryImpl implements BookRepository {
 
     @Inject
     DataSource dataSource;
+
+    @Inject
+    BookFacade bookFacade;
+
 
     @Override
     public List<Book> getBookByTitle(String title) throws SQLException {
@@ -81,6 +84,35 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
+    public Optional<Book> findBookById(BookId id) throws SQLException {
+
+        String sql = "SELECT id, title, authorName, authorSurname, year, reserved, borrowed FROM Books " +
+                "WHERE id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, id.bookId());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+               if( resultSet.next())  {
+
+                    BookId bookId = new BookIdRecord(resultSet.getString("id"));
+                    String title = resultSet.getString("title");
+                    Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
+                    int year = resultSet.getInt("year");
+                    boolean reserved = resultSet.getBoolean("reserved");
+                    boolean borrowed = resultSet.getBoolean("borrowed");
+                    return Optional.of(new BookRecord(bookId, title, bookAuthor, year, reserved, borrowed)) ;
+               }else {
+                   throw new SQLException("Could not find Book with id " + id.bookId());
+               }
+            }
+        }
+    }
+
+    @Override
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
@@ -124,6 +156,10 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public void reserveBook(BookId bookId) throws SQLException {
 
+        findBookById(bookId);
+
+        if(bookFacade.isBookReserved(bookId)) {
+
         String sql = "UPDATE Books SET reserved = 1 WHERE id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -131,12 +167,10 @@ public class BookRepositoryImpl implements BookRepository {
 
             preparedStatement.setString(1, bookId.bookId());
 
-           int rowsUpdated = preparedStatement.executeUpdate();
-
-            if (rowsUpdated == 0) {
-                throw new SQLException("No book found with the given ID.");
-            }
+            preparedStatement.executeUpdate();
         }
+        }else
+            throw new SQLException("Book is allready reserved");
 
     }
 
@@ -162,6 +196,10 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public void borrowBook(BookId bookId) throws SQLException {
 
+        findBookById(bookId);
+
+        if (!bookFacade.isBookBorrowed(bookId)) {
+
         String sql = "UPDATE Books SET borrowed = 1 WHERE id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -169,12 +207,10 @@ public class BookRepositoryImpl implements BookRepository {
 
             preparedStatement.setString(1, bookId.bookId());
 
-            int rowsUpdated = preparedStatement.executeUpdate();
-
-            if (rowsUpdated == 0) {
-                throw new SQLException("No book found with the given ID.");
-            }
+            preparedStatement.executeUpdate();
         }
+
+        }else throw new SQLException("Book is already borrowed.");
     }
 
     @Override

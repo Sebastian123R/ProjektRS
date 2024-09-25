@@ -1,6 +1,6 @@
 package org.san.Books;
 
-public interface Author {
+ public interface Author {
    String authorName();
    String authorSurname();
 }

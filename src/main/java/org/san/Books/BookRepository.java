@@ -1,15 +1,16 @@
 package org.san.Books;
 
-import org.san.Books.app.BookIdRecord;
-
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository {
 
     List<Book> getBookByTitle(String title) throws SQLException;
 
     List<Book> findBookByAuthor(Author author) throws SQLException;
+
+    Optional<Book> findBookById(BookId id) throws SQLException;
 
     List<Book> getAllBooks();
 
@@ -22,4 +23,5 @@ public interface BookRepository {
     void borrowBook(BookId id) throws SQLException;
 
     void returnBook(BookId id) throws SQLException;
+
 }

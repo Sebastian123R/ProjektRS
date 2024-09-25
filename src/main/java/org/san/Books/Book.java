@@ -5,4 +5,6 @@ public interface Book {
     String Title();
     Author Author();
     int year();
+    boolean isReserved();
+    boolean isBorrowed();
 }

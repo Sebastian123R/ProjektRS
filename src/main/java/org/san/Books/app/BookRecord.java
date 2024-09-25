@@ -22,4 +22,5 @@ public record BookRecord(BookId bookId,
     public Author Author() {
         return author;
     }
+
 }

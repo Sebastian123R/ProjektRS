@@ -11,6 +11,7 @@ import org.san.Books.BookRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Path("/books/v1")
@@ -25,6 +26,13 @@ public class BookResource {
     public List<Book> getAllBooks() {
 
         return bookRepositoryImpl.getAllBooks();
+    }
+    @GET
+    @Path("FindById")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Optional<Book> findBookById(@QueryParam("id")String bookId) throws SQLException {
+        BookId bookIdRecord = new BookIdRecord(bookId);
+        return bookRepositoryImpl.findBookById(bookIdRecord);
     }
 
     @GET
@@ -57,18 +65,18 @@ public class BookResource {
     @PUT
     @Path("/reserveBook")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reserveBook(@QueryParam("id") String id) {
-       try {
+    public Response reserveBook(@QueryParam("id") String id) throws SQLException {
+      // try {
            BookId bookIdRecord = new BookIdRecord(id);
            bookRepositoryImpl.reserveBook(bookIdRecord);
            return Response.ok("Book id: " + bookIdRecord + "reserved").build();
-       } catch (SQLException e) {
-           return Response.status(Response.Status.NOT_FOUND)
-                   .entity("Book with the given ID not found").build();
-       }
+//       } catch (SQLException e) {
+//           return Response.status(Response.Status.NOT_FOUND)
+//                   .entity("Book with the given ID not found").build();
+//       }
     }
     @PUT
-    @Path("/cacelReserv")
+    @Path("/cancelReserv")
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelReserveBook(@QueryParam("id") String id) {
         try {
@@ -84,15 +92,15 @@ public class BookResource {
     @PUT
     @Path("/borrowBook")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response borrowBook(@QueryParam("id") String id) {
-        try {
+    public Response borrowBook(@QueryParam("id") String id) throws SQLException {
+      //  try {
             BookId bookIdRecord = new BookIdRecord(id);
             bookRepositoryImpl.borrowBook(bookIdRecord);
             return Response.ok("Book id: " + bookIdRecord + "borrowed").build();
-        } catch (SQLException e) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Book with the given ID not found").build();
-        }
+//        } catch (SQLException e) {
+//            return Response.status(Response.Status.NOT_FOUND)
+//                    .entity("Book with the given ID not found").build();
+//        }
     }
 
     @PUT
