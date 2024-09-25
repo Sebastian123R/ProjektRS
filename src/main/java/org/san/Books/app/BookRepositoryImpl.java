@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-public class BookRepositoryImpl implements BookRepository {
+class BookRepositoryImpl implements BookRepository {
 
     @Inject
     DataSource dataSource;

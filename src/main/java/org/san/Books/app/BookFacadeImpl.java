@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @ApplicationScoped
-public class BookFacadeImpl implements BookFacade {
+ class BookFacadeImpl implements BookFacade {
 
     @Inject
     BookRepository repository;
