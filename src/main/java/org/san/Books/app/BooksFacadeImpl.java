@@ -3,21 +3,21 @@ package org.san.Books.app;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.san.Books.Book;
-import org.san.Books.BookFacade;
+import org.san.Books.BooksFacade;
 import org.san.Books.BookId;
-import org.san.Books.BookRepository;
+import org.san.Books.BooksRepository;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 @ApplicationScoped
- class BookFacadeImpl implements BookFacade {
+ public final class BooksFacadeImpl implements BooksFacade {
 
     @Inject
-    BookRepository repository;
+    BooksRepository repository;
 
     @Override
-    public boolean isBookBorrowed(BookId bookId) throws SQLException {
+    public final boolean isBookBorrowed(BookId bookId) throws SQLException {
 
         Optional<Book> optionalBook = repository.findBookById(bookId);
 
@@ -30,7 +30,7 @@ import java.util.Optional;
     }
 
     @Override
-    public boolean isBookReserved(BookId bookId) throws SQLException {
+     public final boolean isBookReserved(BookId bookId) throws SQLException {
 
         Optional<Book> optionalBook = repository.findBookById(bookId);
 

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookRepository {
+public interface BooksRepository {
 
     List<Book> getBookByTitle(String title) throws SQLException;
 

@@ -12,13 +12,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-class BookRepositoryImpl implements BookRepository {
+class BooksRepositoryImpl implements BooksRepository {
 
     @Inject
     DataSource dataSource;
 
     @Inject
-    BookFacade bookFacade;
+    BooksFacade booksFacade;
 
     private Book mapFieldsToValue(ResultSet resultSet) throws SQLException {
 
@@ -33,7 +33,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> getBookByTitle(String title) throws SQLException {
+    public final List<Book> getBookByTitle(String title) throws SQLException {
 
         List<Book> books = new ArrayList<>();
 
@@ -57,7 +57,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> findBookByAuthor(Author author) throws SQLException {
+    public final List<Book> findBookByAuthor(Author author) throws SQLException {
 
         List<Book> books = new ArrayList<>();
 
@@ -82,7 +82,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public Optional<Book> findBookById(BookId id) throws SQLException {
+    public final Optional<Book> findBookById(BookId id) throws SQLException {
 
         String sql = "SELECT id, title, authorName, authorSurname, year, reserved, borrowed FROM Books " +
                 "WHERE id = ?";
@@ -106,7 +106,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> getAllBooks() throws SQLException {
+    public final List<Book> getAllBooks() throws SQLException {
 
         List<Book> books = new ArrayList<>();
 
@@ -128,7 +128,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public void insertBook(Book book) throws SQLException {
+    public final void insertBook(Book book) throws SQLException {
         String sql = "INSERT INTO Books (id, title, authorName, authorSurname, year) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = dataSource.getConnection();
@@ -145,11 +145,11 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public void reserveBook(BookId bookId) throws SQLException {
+    public final void reserveBook(BookId bookId) throws SQLException {
 
         findBookById(bookId);
 
-        if(!bookFacade.isBookReserved(bookId) && !bookFacade.isBookBorrowed(bookId)) {
+        if(!booksFacade.isBookReserved(bookId) && !booksFacade.isBookBorrowed(bookId)) {
 
         String sql = "UPDATE Books SET reserved = 1 WHERE id = ?";
 
@@ -165,10 +165,10 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public void cancelReservation(BookId bookId) throws SQLException {
+    public final void cancelReservation(BookId bookId) throws SQLException {
 
         findBookById(bookId);
-        if (bookFacade.isBookReserved(bookId)) {
+        if (booksFacade.isBookReserved(bookId)) {
             String sql = "UPDATE Books SET reserved = 0 WHERE id = ?";
 
             try (Connection connection = dataSource.getConnection();
@@ -182,11 +182,11 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public void borrowBook(BookId bookId) throws SQLException {
+    public final void borrowBook(BookId bookId) throws SQLException {
 
         findBookById(bookId);
 
-        if (!bookFacade.isBookBorrowed(bookId) && !bookFacade.isBookReserved(bookId)) {
+        if (!booksFacade.isBookBorrowed(bookId) && !booksFacade.isBookReserved(bookId)) {
 
         String sql = "UPDATE Books SET borrowed = 1 WHERE id = ?";
 
@@ -202,11 +202,11 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public void returnBook(BookId bookId) throws SQLException {
+    public final void returnBook(BookId bookId) throws SQLException {
 
         findBookById(bookId);
 
-        if(bookFacade.isBookBorrowed(bookId)){
+        if(booksFacade.isBookBorrowed(bookId)){
             String sql = "UPDATE Books SET borrowed = 0 WHERE id = ?";
 
             try (Connection connection = dataSource.getConnection();
