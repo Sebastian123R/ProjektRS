@@ -2,11 +2,8 @@ package org.san.Books.app;
 
 import org.san.Books.BookId;
 
+import java.util.UUID;
 
-public record BookIdRecord(String bookId) implements BookId {
 
-     @Override
-     public String bookId() {
-         return bookId;
-     }
+public record BookIdRecord(UUID bookId) implements BookId {
  }

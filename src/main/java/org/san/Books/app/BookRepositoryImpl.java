@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 class BookRepositoryImpl implements BookRepository {
@@ -19,6 +20,17 @@ class BookRepositoryImpl implements BookRepository {
     @Inject
     BookFacade bookFacade;
 
+    private Book mapFieldsToValue(ResultSet resultSet) throws SQLException {
+
+        BookId bookId = new BookIdRecord(UUID.fromString(resultSet.getString("id")));
+        String title = resultSet.getString("title");
+        Author author = new AuthorRecord(resultSet.getString("authorName"),resultSet.getString("authorSurname"));
+        int year = resultSet.getInt("year");
+        boolean reserved = resultSet.getBoolean("reserved");
+        boolean borrowed = resultSet.getBoolean("borrowed");
+
+        return new BookRecord(bookId, title, author, year, reserved, borrowed);
+    }
 
     @Override
     public List<Book> getBookByTitle(String title) throws SQLException {
@@ -34,21 +46,13 @@ class BookRepositoryImpl implements BookRepository {
             preparedStatement.setString(1,title);
 
         try(ResultSet resultSet = preparedStatement.executeQuery()){
-            while(resultSet.next()) {
-                BookId bookId = new BookIdRecord(resultSet.getString("id"));
-                String bookTitle = resultSet.getString("title");
-                Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
-                int year = resultSet.getInt("year");
-                boolean reserved = resultSet.getBoolean("reserved");
-                boolean borrowed = resultSet.getBoolean("borrowed");
-                Book book = new BookRecord(bookId, bookTitle, bookAuthor, year, reserved, borrowed);
-                books.add(book);
-            }
 
+          while(resultSet.next()) {
+
+              books.add(mapFieldsToValue(resultSet));
+          }
         }
         }
-
-
         return books;
     }
 
@@ -67,19 +71,13 @@ class BookRepositoryImpl implements BookRepository {
             preparedStatement.setString(2,author.authorSurname());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    BookId bookId = new BookIdRecord(resultSet.getString("id"));
-                    String title = resultSet.getString("title");
-                    Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
-                    int year = resultSet.getInt("year");
-                    boolean reserved = resultSet.getBoolean("reserved");
-                    boolean borrowed = resultSet.getBoolean("borrowed");
-                    Book book = new BookRecord(bookId, title, bookAuthor, year, reserved, borrowed);
-                    books.add(book);
+
+                while(resultSet.next()) {
+
+                    books.add(mapFieldsToValue(resultSet));
                 }
             }
         }
-
         return books;
     }
 
@@ -92,19 +90,14 @@ class BookRepositoryImpl implements BookRepository {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, id.bookId());
+            preparedStatement.setString(1, id.bookId().toString());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
                if( resultSet.next())  {
 
-                    BookId bookId = new BookIdRecord(resultSet.getString("id"));
-                    String title = resultSet.getString("title");
-                    Author bookAuthor = new AuthorRecord(resultSet.getString("authorName"), resultSet.getString("authorSurname"));
-                    int year = resultSet.getInt("year");
-                    boolean reserved = resultSet.getBoolean("reserved");
-                    boolean borrowed = resultSet.getBoolean("borrowed");
-                    return Optional.of(new BookRecord(bookId, title, bookAuthor, year, reserved, borrowed)) ;
+                    return Optional.of(mapFieldsToValue(resultSet));
+
                }else {
                    throw new SQLException("Could not find Book with id " + id.bookId());
                }
@@ -114,23 +107,21 @@ class BookRepositoryImpl implements BookRepository {
 
     @Override
     public List<Book> getAllBooks() throws SQLException {
+
         List<Book> books = new ArrayList<>();
+
+        String sql ="SELECT id, title, authorName, authorSurname, year, reserved, borrowed FROM Books";
+
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT id, title, authorName, authorSurname, year, reserved, borrowed FROM Books")) {
+             ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
-                      BookId bookId = new BookIdRecord(resultSet.getString("id"));
-                      String title = resultSet.getString("title");
-                      Author author = new AuthorRecord(resultSet.getString("authorName"),resultSet.getString("authorSurname"));
-                      int year = resultSet.getInt("year");
-                      boolean reserved = resultSet.getBoolean("reserved");
-                      boolean borrowed = resultSet.getBoolean("borrowed");
-                      Book book = new BookRecord(bookId, title, author, year, reserved, borrowed);
-                      books.add(book);
-            }
 
+                books.add(mapFieldsToValue(resultSet));
+            }
         } catch (Exception e) {
+
             throw new SQLException("Data retrieval failed.");
         }
         return books;
@@ -143,10 +134,10 @@ class BookRepositoryImpl implements BookRepository {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, book.BookId().bookId());
-            preparedStatement.setString(2, book.Title());
-            preparedStatement.setString(3, book.Author().authorName());
-            preparedStatement.setString(4, book.Author().authorSurname());
+            preparedStatement.setString(1, book.bookId().bookId().toString());
+            preparedStatement.setString(2, book.title());
+            preparedStatement.setString(3, book.author().authorName());
+            preparedStatement.setString(4, book.author().authorSurname());
             preparedStatement.setInt(5, book.year());
 
             preparedStatement.executeUpdate();
@@ -158,39 +149,36 @@ class BookRepositoryImpl implements BookRepository {
 
         findBookById(bookId);
 
-        if(bookFacade.isBookReserved(bookId)) {
+        if(!bookFacade.isBookReserved(bookId) && !bookFacade.isBookBorrowed(bookId)) {
 
         String sql = "UPDATE Books SET reserved = 1 WHERE id = ?";
 
         try (Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, bookId.bookId());
+            preparedStatement.setString(1, bookId.bookId().toString());
 
             preparedStatement.executeUpdate();
         }
         }else
-            throw new SQLException("Book is allready reserved");
-
+            throw new SQLException("Book is allready reserved or borrowed");
     }
 
     @Override
     public void cancelReservation(BookId bookId) throws SQLException {
 
-        String sql = "UPDATE Books SET reserved = 0 WHERE id = ?";
+        findBookById(bookId);
+        if (bookFacade.isBookReserved(bookId)) {
+            String sql = "UPDATE Books SET reserved = 0 WHERE id = ?";
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, bookId.bookId());
+                preparedStatement.setString(1, bookId.bookId().toString());
 
-            int rowsUpdated = preparedStatement.executeUpdate();
-
-            if (rowsUpdated == 0) {
-                throw new SQLException("No book found with the given ID.");
+                preparedStatement.executeUpdate();
             }
-        }
-
+        }else throw new SQLException("Book was not reserved");
     }
 
     @Override
@@ -198,39 +186,36 @@ class BookRepositoryImpl implements BookRepository {
 
         findBookById(bookId);
 
-        if (!bookFacade.isBookBorrowed(bookId)) {
+        if (!bookFacade.isBookBorrowed(bookId) && !bookFacade.isBookReserved(bookId)) {
 
         String sql = "UPDATE Books SET borrowed = 1 WHERE id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, bookId.bookId());
+            preparedStatement.setString(1, bookId.bookId().toString());
 
             preparedStatement.executeUpdate();
         }
 
-        }else throw new SQLException("Book is already borrowed.");
+        }else throw new SQLException("Book is already borrowed or reserved.");
     }
 
     @Override
     public void returnBook(BookId bookId) throws SQLException {
 
-        String sql = "UPDATE Books SET borrowed = 0 WHERE id = ?";
+        findBookById(bookId);
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        if(bookFacade.isBookBorrowed(bookId)){
+            String sql = "UPDATE Books SET borrowed = 0 WHERE id = ?";
 
-            preparedStatement.setString(1, bookId.bookId());
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            int rowsUpdated = preparedStatement.executeUpdate();
+                preparedStatement.setString(1, bookId.bookId().toString());
 
-            if (rowsUpdated == 0) {
-                throw new SQLException("No book found with the given ID.");
+                preparedStatement.executeUpdate();
             }
-        }
-
+        }else throw new SQLException("Book was not borrowed.");
     }
 }
-
-

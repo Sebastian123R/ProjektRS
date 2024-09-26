@@ -1,9 +1,9 @@
 package org.san.Books;
 
 public interface Book {
-    BookId BookId();
-    String Title();
-    Author Author();
+    BookId bookId();
+    String title();
+    Author author();
     int year();
     boolean isReserved();
     boolean isBorrowed();
