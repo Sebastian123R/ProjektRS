@@ -17,7 +17,7 @@ import java.util.Optional;
     BooksRepository repository;
 
     @Override
-    public final boolean isBookBorrowed(BookId bookId) throws SQLException {
+    public boolean isBookBorrowed(BookId bookId) throws SQLException {
 
         Optional<Book> optionalBook = repository.findBookById(bookId);
 
@@ -30,7 +30,7 @@ import java.util.Optional;
     }
 
     @Override
-     public final boolean isBookReserved(BookId bookId) throws SQLException {
+     public boolean isBookReserved(BookId bookId) throws SQLException {
 
         Optional<Book> optionalBook = repository.findBookById(bookId);
 
@@ -40,6 +40,11 @@ import java.util.Optional;
            return book.isReserved();
         }
         return false;
+
+    }
+
+    @Override
+    public void OnlyLoggedIn(){
 
     }
 }

@@ -21,4 +21,9 @@ public class ProfilesFacadeImpl implements ProfilesFacade {
         }
         return EMAIL_PATTERN.matcher(email).matches();
     }
+
+    @Override
+    public boolean isCorrectPassword(String password) {
+        return false;
+    }
 }

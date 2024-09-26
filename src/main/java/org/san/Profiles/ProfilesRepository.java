@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface ProfilesRepository {
 
-    void createNewProfile(Profile profile);
+    void addNewProfile(Profile profile);
 
     Optional<Profile> findProfileById(ProfileId profileId);
 

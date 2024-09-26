@@ -7,4 +7,6 @@ public interface BooksFacade {
      boolean isBookBorrowed(BookId bookId) throws SQLException;
 
      boolean isBookReserved(BookId bookId) throws SQLException;
+
+     void OnlyLoggedIn();
 }

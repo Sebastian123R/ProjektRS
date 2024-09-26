@@ -5,5 +5,4 @@ String userName();
 String userSurname();
 Email email();
 int phoneNumber();
-
 }

@@ -7,7 +7,6 @@ public interface Profile {
     Login login();
     Password password();
     ProfileUserInformation profileUserInformation();
-    ProfileSettings profileSettings();
     ProfileHistory profileHistory();
     LocalDate lastLoggedIn();
 }
