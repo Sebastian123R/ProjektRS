@@ -12,7 +12,7 @@ public interface BookRepository {
 
     Optional<Book> findBookById(BookId id) throws SQLException;
 
-    List<Book> getAllBooks();
+    List<Book> getAllBooks() throws SQLException;
 
     void insertBook(Book book) throws SQLException;
 

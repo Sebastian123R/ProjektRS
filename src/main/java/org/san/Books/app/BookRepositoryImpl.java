@@ -113,7 +113,7 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> getAllBooks() {
+    public List<Book> getAllBooks() throws SQLException {
         List<Book> books = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
@@ -131,7 +131,7 @@ class BookRepositoryImpl implements BookRepository {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SQLException("Data retrieval failed.");
         }
         return books;
     }

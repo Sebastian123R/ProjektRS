@@ -19,28 +19,25 @@ import java.util.Optional;
     @Override
     public boolean isBookBorrowed(BookId bookId) throws SQLException {
 
-        boolean isBorrowed;
-
         Optional<Book> optionalBook = repository.findBookById(bookId);
 
         if (optionalBook.isPresent()) {
 
             Book book = optionalBook.get();
-         return isBorrowed = book.isBorrowed();
+         return book.isBorrowed();
         }
         return false;
     }
 
     @Override
     public boolean isBookReserved(BookId bookId) throws SQLException {
-        boolean isReserved;
 
         Optional<Book> optionalBook = repository.findBookById(bookId);
 
         if (optionalBook.isPresent()) {
 
             Book book = optionalBook.get();
-            return isReserved = book.isReserved();
+           return book.isReserved();
         }
         return false;
 

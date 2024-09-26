@@ -23,7 +23,7 @@ public class BookResource {
     @GET
     @Path("/allbooks")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Book> getAllBooks() {
+    public List<Book> getAllBooks() throws SQLException {
 
         return bookRepositoryImpl.getAllBooks();
     }
@@ -66,14 +66,11 @@ public class BookResource {
     @Path("/reserveBook")
     @Produces(MediaType.APPLICATION_JSON)
     public Response reserveBook(@QueryParam("id") String id) throws SQLException {
-      // try {
+
            BookId bookIdRecord = new BookIdRecord(id);
            bookRepositoryImpl.reserveBook(bookIdRecord);
            return Response.ok("Book id: " + bookIdRecord + "reserved").build();
-//       } catch (SQLException e) {
-//           return Response.status(Response.Status.NOT_FOUND)
-//                   .entity("Book with the given ID not found").build();
-//       }
+
     }
     @PUT
     @Path("/cancelReserv")
@@ -93,14 +90,11 @@ public class BookResource {
     @Path("/borrowBook")
     @Produces(MediaType.APPLICATION_JSON)
     public Response borrowBook(@QueryParam("id") String id) throws SQLException {
-      //  try {
+
             BookId bookIdRecord = new BookIdRecord(id);
             bookRepositoryImpl.borrowBook(bookIdRecord);
             return Response.ok("Book id: " + bookIdRecord + "borrowed").build();
-//        } catch (SQLException e) {
-//            return Response.status(Response.Status.NOT_FOUND)
-//                    .entity("Book with the given ID not found").build();
-//        }
+
     }
 
     @PUT
