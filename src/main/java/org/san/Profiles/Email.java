@@ -1,4 +1,5 @@
-package org.san.Books.app;
+package org.san.Profiles;
 
 public interface Email {
+    String email();
 }
